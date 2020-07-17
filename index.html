@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <title>Visor d'operadors</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    <!--multiselect-->
+    <link rel="stylesheet" href="flama/stylesheet.css">
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+
+     <!--Locate Control-->
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+     <script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+
+    <!--Geocoder -->
+    <script src="https://rawgit.com/k4r573n/leaflet-control-osm-geocoder/master/Control.OSMGeocoder.js"></script>
+    <link rel="stylesheet"
+        href="https://rawgit.com/k4r573n/leaflet-control-osm-geocoder/master/Control.OSMGeocoder.css" />
+
+
+
+    <!-- DADES -->
+    
+    <script src="parades1.js" type="text/javascript"></script>
+    <script src="dades.js" type="text/javascript"></script>
+    <script src="linies1.js" type="text/javascript"></script>
+    <script src="linies2.js" type="text/javascript"></script>
+    <script src="linies3.js" type="text/javascript"></script>
+    <script src="linies4.js" type="text/javascript"></script>
+    <script src="linies5.js" type="text/javascript"></script>
+    <script src="linies6.js" type="text/javascript"></script>
+
+
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        html,
+        body,
+        #mapid {
+            height: 100%;
+            font-family: "Flama", "Verdana", sans-serif;
+        }
+
+        #container {
+            width: 100%;
+
+        }
+
+        #geocodeError {
+                position: absolute;
+                display: none;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                padding: 25px;
+                width: 250px;
+                height: 150px;
+                background: #fff;
+                border: 2px solid #000;   
+                font-weight: bold;
+                font-size: 1.1em;
+                text-align: center;
+                z-index: 2000;
+            }
+
+            #errorCloseBtn {
+            position: absolute;
+            padding: 8px;    
+            top: 2px;
+            right: 4px;
+            font-weight: bold;
+            font-size: 0.96em;
+            }
+
+            #errorText {
+                margin-top: 30px;
+            }
+
+
+        .leaflet-control-layers-toggle:after {
+            color: white !important;
+            content: "Canvia grups/operadores";
+            padding-right: 10px;
+            font-size: 14px;
+        }
+
+        .leaflet-control-layers-toggle {
+            background-image: url(https://unpkg.com/leaflet@1.6.0/dist/images/layers.png), linear-gradient(135deg, rgb(0, 153, 137), rgb(175,203,55));
+            background-color:  rgb(0, 153, 137);
+            width: auto;
+            background-position: 3px 50%;
+            padding-left: 36px;
+            text-decoration: none;
+            line-height: 36px;
+            border-radius: 5px;
+        }
+
+        .leaflet-control-layers-expanded .label {
+            font-weight: 400 !important;
+        }
+
+        .legend {
+            padding: 6px 8px;
+            width: 100px;
+            font: 14px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            line-height: 24px;
+            color: #555;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .legend h4 {
+            text-align: center;
+            font-size: 16px;
+            margin: 2px 12px 8px;
+            color: #777;
+        }
+
+        .legend span {
+            position: relative;
+            bottom: 3px;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin: 0 8px 0 0;
+            opacity: 0.7;
+        }
+        .multiselect {
+            
+            background-image: linear-gradient(135deg, rgb(0, 153, 137), rgb(175,203,55));
+            background-color:  rgb(0, 153, 137);
+            color: white;
+            z-index: 10000;
+            position: absolute;
+            border: 0px;
+            box-shadow: 2px 2px 5px #aaaaaa;
+
+        }
+
+        .multiselect:hover, .multiselect:focus {
+            background-image: linear-gradient(135deg, rgb(0, 120, 107), rgb(143,170,27)) !important;
+            background-color: rgb(56, 95, 83) ;
+            color: white !important;
+           
+
+        }
+
+        .poptitle {
+            font-size: 18px;
+            font-weight: bolder;
+            text-align: center;
+        }
+
+        .pop {
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            text-align: center;
+        }
+
+        .titol {
+            font-weight: bolder;
+            font-size: 16px;
+            text-align: center;
+            padding-top: 5px;
+        }
+
+        .barra, .btn-group{
+			z-index: 10000;
+		}
+
+        .barra {
+            background: white;
+            border-radius: 5px;
+            
+            z-index: 10000;
+            position: relative;
+        }
+        .tooltip-mapa{
+            font-size: 1.20em;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div id="mapid">
+        <div class="container">
+            <select id="grups" multiple="multiple" onchange=""></select>
+            <select id="operador" multiple="multiple" onchange=""></select>
+        </div>
+    </div>
+    <script>
+        // ajuntar els 6 js de línies en una sola variable (pesen massa i no es pot pujar com un sol fitxer al github)
+        var llfitxers = [linies1,linies2,linies3,linies4,linies5,linies6]
+        var linies = {"type": "FeatureCollection", "name": "prova", "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}}, "features": []};
+
+        for(var i in llfitxers){
+            console.log(llfitxers[i].length)
+            for(var j in llfitxers[i]){
+                linies.features.push(llfitxers[i][j]);
+            }
+        }
+        console.log(linies)
+
+            /****** INIT ******/
+            $(document).ready(function () {
+                $('#grups').multiselect({
+                    includeSelectAllOption: true,
+                    buttonWidth: 250,
+                    enableFiltering: true,
+                    enableCaseInsensitiveFiltering: true,
+                    maxHeight: 450,
+                    allSelectedText: 'Selecciona Grup'
+                });
+
+                $('#operador').multiselect({
+                    includeSelectAllOption: true,
+                    buttonWidth: 250,
+                    enableFiltering: true,
+                    enableCaseInsensitiveFiltering: true,
+                    maxHeight: 450,
+                    allSelectedText: 'Selecciona Operador'
+                });
+
+
+                
+
+                
+
+                $("#grups").multiselect('selectAll', false);
+                $("#grups").multiselect('updateButtonText');
+                
+                $("#operador").multiselect('selectAll', false);
+                $("#operador").multiselect('updateButtonText');
+                
+                
+
+            });
+
+
+        //llista d'operadors i assignació aleatòria de colors --> var operadors
+        var operadors = {}
+        var lls_operadors = [];
+            for(var i in parades.features){
+                for(var j in parades.features[i].properties.agencies){
+                var agency = parades.features[i].properties.agencies[j];
+                    if(typeof operadors[agency.name]=='undefined'){
+                        operadors[agency.name]={name: agency.name, color: "hsl("+Math.floor(Math.random() * 361)+", "+Math.floor(Math.random() * 50+50)+"%, "+Math.floor(Math.random() * 51+25)+"%)"}
+                        lls_operadors.push(agency.name)
+                    }
+                }
+            }
+
+        //afegir la propietat de grups d'operadores al json de parades
+        for (var i in parades.features){
+            var parada = parades.features[i];
+            parades.features[i].properties.operadores = []
+            
+            var grups = []
+            for (j in parada.properties.agencies){
+                parades.features[i].properties.operadores.push(parada.properties.agencies[j].name)
+                grups.push(pgrup[parada.properties.agencies[j].name])
+            }
+            var grups1= []
+            $.each(grups, function(i, el){if($.inArray(el, grups1) === -1) grups1.push(el);});
+            parades.features[i].properties.grups = grups1
+        }
+        var stops = {}
+
+        //menu visor
+        var gr = {}
+        var lls_grups = []
+        for(var i in pgrup){
+            if(typeof gr[pgrup[i]]=="undefined"){
+                gr[pgrup[i]]={color: colorgrup[pgrup[i]], operadors:[]}
+                lls_grups.push(pgrup[i]);
+            }
+            var t = {
+                name: i,
+                color: operadors[i].color,
+            }
+            gr[pgrup[i]].operadors.push(t)
+        }
+
+        //crear selects
+        var arr = new Array
+        var arr1 = new Array
+                for (var i in gr) {
+                    arr.push(i)
+                    for(var j in gr[i].operadors){
+                        arr1.push(gr[i].operadors[j].name);
+                        
+                    }
+                }
+                var unique = [...new Set(arr)];
+                for (var i in unique) {
+                    var option = document.createElement("option");
+                    var text = document.createTextNode(unique[i]);
+                    option.appendChild(text);
+                    option.value = unique[i]
+                    var element = document.getElementById("grups");
+                    element.appendChild(option);
+                }
+              
+                
+                var unique = [...new Set(arr1)];
+                for (var i in unique) {
+                    var option = document.createElement("option");
+                    var text = document.createTextNode(unique[i]);
+                    option.appendChild(text);
+                    option.value = unique[i]
+                    var element = document.getElementById("operador");
+                    element.appendChild(option);
+                }
+
+            //crear geojsons per parades i linies tant de grups com d'operadors, a partir del raw data extret de l'aplicació que converteix del chromeiql  
+            var array1 = [];
+            var llistatipus = ["grups","operadores"];
+            var stops = {features: [],} //PARADES GRUPS
+            var stops1 = {features: [],} //PARADES OPERADORS
+            var recorreguts = {features: [],} //RECORREGUTS GRUPS
+            var recorreguts1 = {features: [],} //RECORREGUTS OPERADORES
+            for (var x in llistatipus){
+                
+                var tipus = llistatipus[x]
+                for (var i in parades){
+                    if(i!="features"){
+                        stops[i]=parades[i]
+                        stops1[i]=parades[i]
+                    }
+                    
+                }
+            
+                for(var i in parades.features){
+                    var w = 0
+                    for(var j in parades.features[i].properties[tipus]){ //per cada operador/grup i parada, fa un punt (per no sobreposar diferents operadors d'una mateixa parada)
+                        
+                            var parada = {properties: {}, geometry: {},type:"Feature"}
+                            
+                            parada.properties = {
+                                companyia: parades.features[i].properties[tipus][j],
+                                name: parades.features[i].properties.name
+                            }
+                            parada.geometry.type = "Point"
+                            parada.geometry.coordinates = [parades.features[i].geometry.coordinates[0]+0.0003*w,parades.features[i].geometry.coordinates[1]+0.0003*w];
+                            if(tipus=="grups"){parada.properties.color = colorgrup[parada.properties.companyia];parada.validacio = "grup"; stops.features.push(parada);}
+                            else{parada.properties.color = operadors[parada.properties.companyia].color;stops1.features.push(parada)}
+                            
+                            
+                            w++;
+                        
+                    }
+                    
+                    
+                }
+
+                //es crea un nou objecte "recorreguts" en format geojson, on s'hi inclouen les els traçats de les linies filtrades
+
+
+
+                for (var i in linies){
+                    if(i!="features"){
+                        recorreguts[i]=parades[i]
+                        recorreguts1[i]=parades[i]
+                    }
+                
+                }
+                for(var i in linies.features){
+                    //crear el feature de cada línia
+                        var rec = {properties: {}, geometry: {},type:"Feature"}     
+                        for(k in linies.features[i].properties){
+                            rec.properties[k]=linies.features[i].properties[k]
+                        }
+                        rec.geometry = linies.features[i].geometry
+                        
+                            if(tipus=="grups"){
+                                rec.properties.companyia = pgrup[rec.properties.agency];
+                                rec.properties.color = colorgrup[pgrup[rec.properties.agency]];
+                                rec.properties.validacio = "grup";
+                                recorreguts.features.push(rec)
+                            }
+                            else{
+
+                                rec.properties.companyia = rec.properties.agency;
+                                rec.properties.color = operadors[rec.properties.companyia].color;
+                                rec.properties.validacio = "operadora";
+
+                                recorreguts1.features.push(rec)
+                            }                  
+                }
+
+
+            
+            }    
+
+            //console.log(recorreguts,recorreguts1,stops,stops1)
+
+        var selectedGrup
+        var selectedOperator
+        var mymap = L.map('mapid').setView([41.392264, 2.162247], 13);
+
+		mymap.createPane('labels');
+		mymap.getPane('labels').style.zIndex = 630;
+        mymap.getPane('labels').style.pointerEvents = 'none';
+        
+        mymap.createPane('parades');
+		mymap.getPane('parades').style.zIndex = 620;
+        //mymap.getPane('parades').style.pointerEvents = 'none';
+
+        mymap.createPane('linies');
+		mymap.getPane('linies').style.zIndex = 600;
+		//mymap.getPane('linies').style.pointerEvents = 'none';
+        
+        var positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png', {
+				attribution: '©OpenStreetMap, ©CartoDB'
+        }).addTo(mymap);
+		
+		var CartoDB_PositronOnlyLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+			subdomains: 'abcd',
+            maxZoom: 18,
+            pane: 'labels'
+		});
+		
+        
+
+ 
+
+
+         //creem caixa d'error
+         var geocodeErEl = document.createElement('div');
+        geocodeErEl.setAttribute('id', 'geocodeError');
+            
+        //botó d tancar
+        var geocoderErCloseEl = document.createElement('input');
+        geocoderErCloseEl.setAttribute('id','errorCloseBtn');
+        geocoderErCloseEl.setAttribute('type','button');
+        geocoderErCloseEl.setAttribute('value', 'X');
+            
+        //text error
+        var geocodeErTextEl = document.createElement('p');
+        geocodeErTextEl.setAttribute('id','errorText');
+            
+        
+        jQuery(geocodeErEl).append(geocoderErCloseEl);
+        jQuery(geocodeErEl).append(geocodeErTextEl);
+        jQuery('#mapid').append(geocodeErEl);
+
+    
+
+        L.control.locate({    position: 'topleft', flyTo: "true", initialZoomLevel: "13"   }).addTo(mymap);
+        
+        function tooltip (feature, layer){
+			layer.bindTooltip(feature.properties.name+"<br><svg class='' width='15' height='10'><circle cx='5' cy='5' r='5' fill='"+feature.properties.color+"'/></svg><b>"+feature.properties.companyia+"</b>",{sticky: true, className: 'tooltip-mapa'});
+		}
+
+        function tooltip_linies (feature, layer){
+			layer.bindTooltip(feature.properties.shortName+"<br><svg class='' width='25' height='10'><line x2='0' y2='5' x1='20' y1='5' style='stroke:"+feature.properties.color+";stroke-width:3'/> </svg><b>"+feature.properties.companyia+"</b>",{sticky: true, className: 'tooltip-mapa'});
+		}
+
+        function estil_linies(feature) {
+		    return {
+                color: feature.properties.color,
+                weight: 3,
+                opacity: 0.7,
+            };
+        };
+        
+        function estil_parades(feature) {
+		    return {
+                radius: 5,
+                fillColor: feature.properties.color,
+                //color: feature.properties.color,
+                weight: 0,
+                //opacity: 1,
+                fillOpacity: 0.7,
+            };
+        };
+    
+        //esdeveniment: actualitzar dades en canviar valors del multiselect
+
+        $('#grups').on('change', function (element, checked) {
+            selectedGrup = $(this).val();
+            console.log(selectedGrup)
+            paradesgrups.clearLayers()
+            paradesgrups.addData(stops)
+            liniesgrups.clearLayers()
+            liniesgrups.addData(recorreguts)
+        });
+
+        $('#operador').on('change', function (element, checked) {
+            selectedOperator = $(this).val();
+            paradesoperadors.clearLayers()
+            paradesoperadors.addData(stops1)
+            liniesoperadors.clearLayers()
+            liniesoperadors.addData(recorreguts1)
+        });
+
+        // definició de les capes
+        selectedGrup = lls_grups;
+        selectedOperator = lls_operadors;
+
+
+        paradesgrups = L.geoJSON(null, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    pane: 'parades',
+                });
+            },
+            style: estil_parades,
+            filter: function (feature, layer) {
+                const l = selectedGrup.includes(feature.properties.companyia)
+                return l
+            },
+            onEachFeature: tooltip,
+        })
+
+        liniesgrups = L.geoJSON(null, {
+            style: estil_linies,
+            filter: function (feature, layer) {
+                const m = selectedGrup.includes(feature.properties.companyia)
+                return m
+            },
+            onEachFeature: tooltip_linies,
+            pane: 'linies',
+        })
+
+        paradesoperadors = L.geoJSON(null, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, {
+                    pane: 'parades',
+                });
+            },
+            style: estil_parades,
+            filter: function (feature, layer) {
+                const l = selectedOperator.includes(feature.properties.companyia)
+                return l
+            },
+            onEachFeature: tooltip,
+        })
+
+        liniesoperadors = L.geoJSON(null, {
+            style: estil_linies,
+            filter: function (feature, layer) {
+                const m = selectedOperator.includes(feature.properties.companyia)
+                return m
+            },
+            onEachFeature: tooltip_linies,
+            pane: 'linies',
+        })
+        
+        paradesgrups.addData(stops)
+        liniesgrups.addData(recorreguts)
+        paradesoperadors.addData(stops1)
+        liniesoperadors.addData(recorreguts1)
+
+        //grups de capes
+        var g_grups = L.layerGroup([paradesgrups,liniesgrups]).addTo(mymap);
+        var g_operadores = L.layerGroup([paradesoperadors,liniesoperadors]);
+
+        //capes obligatòries
+        var basemap = {
+            'Cartografia de base': positron,
+        };
+
+        //capes opcionals
+		var overlayMaps = {
+
+            "Grups": g_grups,
+            "Operadores": g_operadores,
+            "Mostra etiquetes": CartoDB_PositronOnlyLabels,
+		};
+
+        //afegir capes
+        L.control.layers(basemap, overlayMaps).addTo(mymap);
+        L.control.scale().addTo(mymap);
+        
+        // OSM Geocoder
+        var osmGeocoder = new L.Control.OSMGeocoder({
+            collapsed: true,
+            position: 'topright',
+            text: 'Cerca',
+            placeholder: 'direcció',    
+            callback: function(results) {
+            
+            var geocodeErrorBox = jQuery('#geocodeError');
+            var geocodeErrorText = jQuery('#errorText');
+            
+            // close error box if it is open
+            if (!geocodeErrorBox.css('display','none')) {
+                geocodeErrorBox.hide();
+            }
+            
+            // If no results are found, add a message to the screen
+            if (results.length == 0) {
+				// placeholder="" is key to selecting DOM element
+                var searchText = jQuery('.leaflet-control-geocoder-form input[placeholder="Enter address"]').val();
+                // get search text or result text and put that in box
+                geocodeErrorText.html('No results found for ' + searchText);
+                geocodeErrorBox.show();
+                return;
+			}
+        
+            // get coordinates for result
+            var coords = L.latLng(results[0].lat,results[0].lon);
+                
+            mymap.setView(coords,17);  
+            
+            // open pop-up for location
+            var popup = L.popup({closeOnClick: true}).setLatLng(coords).setContent(results[0].display_name).openOn(mymap);
+        }
+            }).addTo(mymap);    
+
+            // add event listener to click event for error message close button
+            jQuery('#errorCloseBtn').click(function() {
+            jQuery('#geocodeError').hide();
+            })
+    </script>
+</body>
+
+</html>
